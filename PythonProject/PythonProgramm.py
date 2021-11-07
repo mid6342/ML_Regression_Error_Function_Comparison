@@ -1,37 +1,22 @@
 import sqlite3
-import csv
-import pandas
-import sqlalchemy as db
-import numpy as np
 
-
+# connect to database
 conn = sqlite3.connect("FindingFunctions.db")
 cur = conn.cursor()
 
-# print ideal table
-ideal_table = cur.execute("SELECT * FROM ideal")
-for i in ideal_table:
-    print(i)
+# function to get a whole column in form of a list
+def get_list_of_column(column, table):
+    # get all the cells of the column and write them to a list
+    query= cur.execute("SELECT " + column + " FROM " + table)
+    list_of_column = []
+    for cell in query: 
+        list_of_column.append(cell[0])  
+    # remove column head
+    list_of_column.pop(0)
+    return list_of_column
+    
+print(get_list_of_column("x", "train"))
 
-print("-------------------------------------------------------------------------------------------")
-print("-------------------------------------------------------------------------------------------")
-print("-------------------------------------------------------------------------------------------")
-print("-------------------------------------------------------------------------------------------")
-
-# print train table
-train_table = cur.execute("SELECT * FROM train")
-for k in train_table:
-    print(k)
-
-
-
-#result=cur.fetchall()
-#print(result)
-#result = conn.execute("SELECT x, y1 FROM train")
-#print(result)
-
-
-          
+# commit and close connection to database    
 conn. commit()
-
 conn.close()
