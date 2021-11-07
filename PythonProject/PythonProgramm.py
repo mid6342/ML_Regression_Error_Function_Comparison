@@ -1,4 +1,5 @@
 import sqlite3
+import numpy as np
 
 # connect to database
 conn = sqlite3.connect("FindingFunctions.db")
@@ -14,8 +15,16 @@ def get_list_of_column(column, table):
     # remove column head
     list_of_column.pop(0)
     return list_of_column
+
+# function for subtracting 2 lists
+def subtract_lists(list_1, list_2):
+    return np.array(list_1) - np.array(list_2)
     
-print(get_list_of_column("x", "train"))
+# print(get_list_of_column("x", "train"))
+# all my columns
+ideal_y1 = get_list_of_column("y1", "ideal")
+train_y1 = get_list_of_column("y1", "train")
+print(subtract_lists(ideal_y1, train_y1))
 
 # commit and close connection to database    
 conn. commit()
