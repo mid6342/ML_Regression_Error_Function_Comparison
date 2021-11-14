@@ -72,18 +72,25 @@ ideal_y25 = get_list_of_column("y25", "ideal")
 #print(test_x)
 #print(test_y)
 
-def get_y_in_ideal(column, table):
+def get_y_in_ideal(column):
     for x_row in test_x:
-        query = cur.execute("SELECT " + column + " FROM " + table + " WHERE " + "x" + "=" + str(x_row))
+        query = cur.execute("SELECT " + column + " FROM ideal WHERE x=" + str(x_row))
         for cell in query: 
-            print(np.asarray(cell))
-        print("x_row: " + str(x_row))
+            y_ideal = np.asarray(cell)
+            print("y wert of ideal function: " + str(y_ideal))
+        query_2 = cur.execute("SELECT y FROM test WHERE " + "x" + "=" + str(x_row))
+        for cell in query_2: 
+            y_test = np.asarray(cell)
+            print("y wert of test point: " + str(y_test))
+        print("x wert of test point: " + str(x_row))
+        deviation = y_test - y_ideal
+        print(deviation)
         print("----------------------------")
             
 
-get_y_in_ideal("y31", "ideal")
+get_y_in_ideal("y31")
 print("y25")
-get_y_in_ideal("y25", "ideal")
+get_y_in_ideal("y25")
 
 
 
