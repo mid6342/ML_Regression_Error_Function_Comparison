@@ -55,15 +55,39 @@ def max_deviation(list_1, list_2):
     # list of squared deviations
     return np.max(np.square(np.array(list_1) - np.array(list_2)))
 
-#print(max_deviation(ideal_y31, train_y4))
+max_dev_y31 = max_deviation(ideal_y31, train_y4)
+print(max_dev_y31)
 """
 Result for the demonstration function and its dedicated train function
 0.24836179255280993
 """
+
+test_x = get_list_of_column("x", "test")
+test_y = get_list_of_column("y", "test")
+ideal_y31 = get_list_of_column("y31", "ideal")
+ideal_y46 = get_list_of_column("y46", "ideal")
+ideal_y6 = get_list_of_column("y6", "ideal")
+ideal_y25 = get_list_of_column("y25", "ideal")
+
+#print(test_x)
+#print(test_y)
+
+def get_y_in_ideal(column, table):
+    for x_row in test_x:
+        query = cur.execute("SELECT " + column + " FROM " + table + " WHERE " + "x" + "=" + str(x_row))
+        for cell in query: 
+            print(np.asarray(cell))
+        print("x_row: " + str(x_row))
+        print("----------------------------")
+            
+
+get_y_in_ideal("y31", "ideal")
+print("y25")
+get_y_in_ideal("y25", "ideal")
+
+
+
     
-
-
-
 # commit and close connection to database    
 conn. commit()
 conn.close()

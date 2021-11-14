@@ -7,16 +7,13 @@ engine = create_engine('sqlite:///FindingFunctions.db', echo=True)
 metadata = MetaData()
 # Define the table with sqlalchemy:
 
-train_table = Table('train', metadata,
+train_table = Table('test', metadata,
     Column('x', REAL),
-    Column('y1', REAL),
-    Column('y2', REAL),
-    Column('y3', REAL),
-    Column('y4', REAL),
+    Column('y', REAL),
 )
 
 metadata.create_all(engine)
-insert_query = "INSERT INTO train (x, y1, y2, y3, y4) VALUES (:x, :y1, :y2, :y3, :y4)"
+insert_query = "INSERT INTO test (x, y) VALUES (:x, :y)"
 
 # Or read the definition from the DB:
 # metadata.reflect(engine, only=['MyTable'])
@@ -26,10 +23,9 @@ insert_query = "INSERT INTO train (x, y1, y2, y3, y4) VALUES (:x, :y1, :y2, :y3,
 # Or hardcode the SQL query:
 # insert_query = "INSERT INTO MyTable (foo, bar) VALUES (:foo, :bar)"
 
-with open('train.csv', 'r', encoding="utf-8") as csvfile:
+with open('test.csv', 'r', encoding="utf-8") as csvfile:
     csv_reader = csv.reader(csvfile, delimiter=',')
     engine.execute(
         insert_query,
-        [{"x": row[0], "y1": row[1], "y2": row[2], "y3": row[3], "y4": row[4]} 
-            for row in csv_reader]
+        [{"x": row[0], "y": row[1]} for row in csv_reader]
     )
