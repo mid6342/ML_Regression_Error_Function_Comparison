@@ -72,25 +72,66 @@ ideal_y25 = get_list_of_column("y25", "ideal")
 #print(test_x)
 #print(test_y)
 
+all_deviations = []
+deviation_2 = []
 def get_y_in_ideal(column):
+    y_test = []
+    first_time = True
     for x_row in test_x:
         query = cur.execute("SELECT " + column + " FROM ideal WHERE x=" + str(x_row))
         for cell in query: 
             y_ideal = np.asarray(cell)
-            print("y wert of ideal function: " + str(y_ideal))
+            #print("y wert of ideal function: " + str(y_ideal))
+        # bis dahin passt alles, da es ja nur durch die ideal function geht
         query_2 = cur.execute("SELECT y FROM test WHERE " + "x" + "=" + str(x_row))
         for cell in query_2: 
-            y_test = np.asarray(cell)
-            print("y wert of test point: " + str(y_test))
-        print("x wert of test point: " + str(x_row))
-        deviation = y_test - y_ideal
-        print(deviation)
-        print("----------------------------")
-            
+            np.array(y_test.append(cell[0]))
+        #print("y wert of test point: " + str(y_test))
+        if(len(y_test) == 1):
+            deviation = abs(y_test - y_ideal)
+            #print("in between")
+            #print(deviation)
+        elif((len(y_test) == 2) & (first_time == True)):
+            deviation = abs(y_test[0] - y_ideal)
+            #print(first_time)
+            #print(deviation)
+            first_time = False
+        else:
+            deviation = abs(y_test[1] - y_ideal)
+            #print(first_time)
+            #print(deviation)
+        y_test.clear()
+        deviation_squareroot = deviation * np.sqrt(2)
+        all_deviations.append(deviation_squareroot[0])
+        deviation_2.append(deviation[0])
+        #print("----------------------------------------------------")
+        #y_test = []
+        #print("x wert of test point: " + str(x_row))
+        #deviation = y_test - y_ideal
+        #print(deviation)
+        #print("----------------------------")
+
 
 get_y_in_ideal("y31")
-print("y25")
+print("31")
+#list of the deviation of all testpoints for the ideal function 31
+print(all_deviations)
+
+print("46")
+get_y_in_ideal("y46")
+print(all_deviations)
+
+print("6")
+get_y_in_ideal("y6")
+print(all_deviations)
+
+print("25")
 get_y_in_ideal("y25")
+print(all_deviations)
+
+#print(deviation_2)
+#print("y25")
+#get_y_in_ideal("y25")
 
 
 
