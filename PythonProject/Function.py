@@ -136,12 +136,12 @@ print(four_deviations)
     #four_deviations.append(res)
 
 
-criterion_2_array = []
+# for loop to get all the results of criterion 2 and save it to the Object
+all = []
+
 for i in four_deviations:   
-    #print(i.deviation)
-    print(i.ideal)
-    #print(i.max_deviation)
-    #print("Hello:  " + str(i.criterion_2))
+
+    criterion_2_array = []
 
     for x in i.deviation:
         if(x <= i.max_deviation + np.sqrt(2)):
@@ -151,10 +151,45 @@ for i in four_deviations:
         else:
             y = "None"
             np.array(criterion_2_array.append(y))
-    print(criterion_2_array)
-    criterion_2_array.clear()
-            
+
+    res = FunctionAndMaxDev(i.ideal, i.deviation, i.max_deviation, criterion_2_array)
+    all.append(res)
     
+"""
+müste so aussehen:
+
+res = FunctionAndMaxDev(k.test_x, k.test_y, i.ideal, criterion_2_array[k])
+
+
+"""
+
+result = []
+for i in range(len(x_column)):
+    np.array(result.append("no Match"))
+
+print(result)
+
+      
+for i in all:
+
+    #print(i.criterion_2)
+    #print(i.ideal)
+    y=0
+    for x in i.criterion_2:
+        print(x)
+        if x != "None":
+            if result[y] == "no Match":
+                result[y] = i.ideal
+            else:
+                result[y] = (result[y], i.ideal)
+        print(y)
+        y = y+1
+
+print("hier gehts los----------------------------------------------------")
+for i in result:
+    print(i)
+
+            
 
 
 
