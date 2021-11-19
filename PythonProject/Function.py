@@ -1,6 +1,7 @@
 import sqlite3
 import numpy as np
 #from operator import itemgetter
+from bokeh.plotting import figure, show, output_file
 
 # connect to database
 conn = sqlite3.connect("FindingFunctions.db")
@@ -65,9 +66,6 @@ class FunctionAndMaxDev:
         self.max_deviation = max_deviation
         self.criterion_2 = criterion_2
 
-y_2 = Ideal("y2")
-#print(y_2.get_column())
-#print(Train("y3"))
 
 # calculating sum of sd for every train, ideal pair
 all_the_sums = []
@@ -82,10 +80,42 @@ for i in range(1, 51):
 sorted_list = sorted(all_the_sums, key=lambda x: x.deviation)
 four_ideal = sorted_list[:4]
 
-x = Test("x")
-x_column = x.get_column()
-#print(x_column)
+hallox = Test("x")
+x_column = hallox.get_column()
+halloy = Test("y")
+y_column = halloy.get_column()
 
+#output_file = 'index.html'
+def visualize(x, y, x_1, y_1):
+    p = figure(
+        title = 'ideal_1',
+        x_axis_label = 'X',
+        y_axis_label = 'Y',
+        y_range = (-30, 30)
+    )
+    p.line(x, y, line_color='red', line_width = 1.25)
+    p.line(x_1, y_1, line_width = 1.25) #, line_width = '2')
+    p.circle(x_column, y_column, size =5, color = 'green')
+    show(p)
+
+#plotting an ideal function
+x_ideal = Ideal("x")
+x_ideal_column = x_ideal.get_column()
+
+y_ideal_column = []
+f_y_column = []
+k = 0
+for i in four_ideal:
+    print(i.ideal)
+    y = Ideal(i.ideal)
+    y_ideal_column.append(y.get_column()) 
+    f = Train(i.train)
+    f_y_column.append(f.get_column())
+    visualize(x_ideal_column, y_ideal_column[k], x_ideal_column, f_y_column[k])
+    k = k+1
+
+print(y_ideal_column[0])
+print(x_ideal_column)
 
 four_deviations = []
 
@@ -144,9 +174,8 @@ for i in four_deviations:
     criterion_2_array = []
 
     for x in i.deviation:
-        if(x <= i.max_deviation + np.sqrt(2)):
-            #print("Criterion2 = " + str((i.max_deviation + np.sqrt(2)) - x))
-            z = i.max_deviation + np.sqrt(2) - x
+        if(x <= (i.max_deviation * np.sqrt(2))):
+            z = (i.max_deviation * np.sqrt(2)) - x
             np.array(criterion_2_array.append(z))
         else:
             y = "None"
@@ -154,14 +183,11 @@ for i in four_deviations:
 
     res = FunctionAndMaxDev(i.ideal, i.deviation, i.max_deviation, criterion_2_array)
     all.append(res)
-    
-"""
-müste so aussehen:
 
-res = FunctionAndMaxDev(k.test_x, k.test_y, i.ideal, criterion_2_array[k])
+print("here it starts")
+for i in all:
+    print(i.criterion_2)  
 
-
-"""
 
 result = []
 for i in range(len(x_column)):
@@ -188,10 +214,6 @@ for i in all:
 print("hier gehts los----------------------------------------------------")
 for i in result:
     print(i)
-
-            
-
-
 
        
 # commit and close connection to database    
