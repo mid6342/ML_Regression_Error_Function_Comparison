@@ -66,19 +66,37 @@ class FunctionAndMaxDev:
         self.max_deviation = max_deviation
         self.criterion_2 = criterion_2
 
+"""
+
+CRITERION 1.
+
+
+"""
 
 # calculating sum of sd for every train, ideal pair
+
+#def calculate_4_ideal_functions():
 all_the_sums = []
-for i in range(1, 51):
-    for k in range(1, 5):
-        ideal_column = Ideal("y" + str(i))
-        train_column = Train("y" + str(k))
-        res = Result("y" + str(i), "y" + str(k), ideal_column.sum_of_squared_deviations(train_column))
+for ideal_index in range(1, 51):
+
+    for train_index in range(1, 5):
+            
+        ideal_column = Ideal("y" + str(ideal_index))
+        train_column = Train("y" + str(train_index))
+        res = Result("y" + str(ideal_index), "y" + str(train_index), 
+        ideal_column.sum_of_squared_deviations(train_column))
         all_the_sums.append(res) 
 
 # sort all deviations to get the 4 smallest
 sorted_list = sorted(all_the_sums, key=lambda x: x.deviation)
 four_ideal = sorted_list[:4]
+
+"""
+
+CRITERION 2.
+
+
+"""
 
 hallox = Test("x")
 x_column = hallox.get_column()
@@ -86,16 +104,19 @@ halloy = Test("y")
 y_column = halloy.get_column()
 
 #output_file = 'index.html'
-def visualize(x, y, x_1, y_1):
+#evtl max y und max x von den testpoints verwenden
+def visualize(x, y, x_1, y_1, x_error_band, y_error_band, y_error_band_minus):
     p = figure(
         title = 'ideal_1',
         x_axis_label = 'X',
         y_axis_label = 'Y',
-        y_range = (-30, 30)
+        #y_range = (-30, 30) # am bestenhier die max y werte der jew column nehmen, das ist das sinnvollstae
     )
     p.line(x, y, line_color='red', line_width = 1.25)
     p.line(x_1, y_1, line_width = 1.25) #, line_width = '2')
     p.circle(x_column, y_column, size =5, color = 'green')
+    p.line(x_error_band, y_error_band, line_color='orange', line_width = 1.25)
+    p.line(x_error_band, y_error_band_minus, line_color='orange', line_width = 1.25)
     show(p)
 
 #plotting an ideal function
@@ -104,26 +125,30 @@ x_ideal_column = x_ideal.get_column()
 
 y_ideal_column = []
 f_y_column = []
+y_error_band = []
+y_error_band_minus = []
 k = 0
 for i in four_ideal:
-    print(i.ideal)
+    #print(i.ideal)
     y = Ideal(i.ideal)
     y_ideal_column.append(y.get_column()) 
     f = Train(i.train)
     f_y_column.append(f.get_column())
-    visualize(x_ideal_column, y_ideal_column[k], x_ideal_column, f_y_column[k])
+    y_error_band.append(y.get_column() + (0.24 * np.sqrt(2)))
+    y_error_band_minus.append(y.get_column() - (0.24 * np.sqrt(2))) 
+    visualize(x_ideal_column, y_ideal_column[k], x_ideal_column, f_y_column[k], x_ideal_column, y_error_band[k], y_error_band_minus[k])
     k = k+1
 
-print(y_ideal_column[0])
-print(x_ideal_column)
+#print(y_ideal_column[0])
+#print(x_ideal_column)
 
 four_deviations = []
 
 # for loop to get all the deviations between each test point and each ideal function, now criterion
 for i in four_ideal:
     
-    print(i.ideal)
-    print(i.train)
+    #print(i.ideal)
+    #print(i.train)
     #print(i.deviation)
 
     first_time = True
@@ -161,7 +186,10 @@ for i in four_ideal:
     res = FunctionAndMaxDev(i.ideal, all_deviations, max_deviation, "None")
     four_deviations.append(res)
 
-print(four_deviations)
+print("the four deviations")
+for i in four_deviations:
+    print(i.max_deviation)
+#print(four_deviations)
     #res = Result(i.ideal, i.train, all_deviations)
     #four_deviations.append(res)
 
@@ -184,16 +212,16 @@ for i in four_deviations:
     res = FunctionAndMaxDev(i.ideal, i.deviation, i.max_deviation, criterion_2_array)
     all.append(res)
 
-print("here it starts")
-for i in all:
-    print(i.criterion_2)  
+#print("here it starts")
+#for i in all:
+#    print(i.criterion_2)  
 
 
 result = []
 for i in range(len(x_column)):
     np.array(result.append("no Match"))
 
-print(result)
+#print(result)
 
       
 for i in all:
@@ -202,18 +230,18 @@ for i in all:
     #print(i.ideal)
     y=0
     for x in i.criterion_2:
-        print(x)
+        #print(x)
         if x != "None":
             if result[y] == "no Match":
                 result[y] = i.ideal
             else:
                 result[y] = (result[y], i.ideal)
-        print(y)
+        #print(y)
         y = y+1
 
-print("hier gehts los----------------------------------------------------")
-for i in result:
-    print(i)
+#print("hier gehts los----------------------------------------------------")
+#for i in result:
+#    print(i)
 
        
 # commit and close connection to database    
