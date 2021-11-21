@@ -4,12 +4,6 @@ import numpy as np
 from bokeh.plotting import figure, show, output_file
 from sqlalchemy.sql.expression import table
 
-#from Classes import Function, Ideal, Train, Test, MeanDeviation, FunctionAndMaxDev
-#from ImportIdeal import import_ideal
-#from ImportTrain import import_train
-#from ImportTest import import_test
-
-
 """
 
 CLASSES
@@ -79,16 +73,10 @@ class Test(Function):
     def __init__(self, column, test_name = "test"):
         super().__init__(column, test_name)
 
-class FunctionAndMaxDev:
-
-    def __init__(self, ideal, deviation, max_deviation, criterion_2):
+class Criterion_2:
+     def __init__(self, ideal, criterion_2):
         self.ideal = ideal
-        self.deviation = deviation
-        self.max_deviation = max_deviation
         self.criterion_2 = criterion_2
-
-    
-
 
 """
 
@@ -238,82 +226,57 @@ def get_dev_and_maxdev(ideal_name = "ideal", train_name = "train", test_name = "
         f = Train(i.train, train_name)
         max_deviation = y.max_deviation(f)
 
+        # ab hier test einer neuen methode
+        criterion_2_array = []
+
+        for x in all_deviations:
+            if(x <= (max_deviation * np.sqrt(2))):
+
+                #z = (max_deviation * np.sqrt(2)) - x
+                np.array(criterion_2_array.append(x))
+
+            else:
+
+                y = "None"
+                np.array(criterion_2_array.append(y))
+
+        #print(criterion_2_array)
+        criterion_2 = Criterion_2(i.ideal, criterion_2_array)
+        four_deviations.append(criterion_2)
+
+
+
+        """
         #four_deviations.append(all_deviations)   
         res = FunctionAndMaxDev(i.ideal, all_deviations, max_deviation, "None")
         four_deviations.append(res)
         print("this are the 4 deviations: ")
         print(all_deviations)
+        """
 
     return four_deviations
     
 # for loop to get all the results of criterion 2 and save it to the Object
 
-
-def get_criterion_2():
-    all = []
-    for i in get_dev_and_maxdev():   
-
-        criterion_2_array = []
-
-        for x in i.deviation:
-            if(x <= (i.max_deviation * np.sqrt(2))):
-                z = (i.max_deviation * np.sqrt(2)) - x
-                np.array(criterion_2_array.append(z))
-            else:
-                y = "None"
-                np.array(criterion_2_array.append(y))
-
-        res = FunctionAndMaxDev(x_column, y_column, i.max_deviation, criterion_2_array)
-        all.append(res)
-    return all
-
-
-#print("here it starts")
-#for i in all:
-#    print(i.criterion_2)  
-
-
-# es fehlt noch die information über die deviation der ideal fnc!!
-# ausgeklammert, da erst schritt für schritt durchs programm
-
-def get_matched_functions(x_c, y_c):
-    all_2 = []
-    #len4    
-    for i in get_criterion_2():
-
-        #print(i.criterion_2)
-        print(i.ideal)
+def get_endresult(x):
+    deviation = ["None"]* len(x)
+    result = ["None"]* len(x)
+    for i in get_dev_and_maxdev():
         y=0
-        
-        deviation = ["no Match"] * len(i.criterion_2)
-        result = ["no Match"] * len(i.criterion_2)
-
-        print(deviation)
-        
         for cell in i.criterion_2:
-            #print(x)
-            print(cell)
-            print(i.max_deviation)
+
             if cell != "None":
-                if result[y] == "no Match":
-                    result[y] = i.max_deviation
-                    deviation[y] = i.criterion_2
-                    #print(result[y])
-                    #print(deviation[y])
+                if deviation[y] == "None":
+                    deviation[y] = cell
+                    result[y] = i.ideal
                 else:
-                    result[y] = (result[y], i.max_deviation)
-                    deviation[y] = (deviation[y], i.criterion_2)
-            #print(y)
+                    deviation[y] = (deviation [y], cell)
+                    result[y] = (result[y], i.ideal)
             y = y+1
-        #print(deviation)
-        res = FunctionAndMaxDev(x_c, y_c, deviation, result)
-        all_2.append(res)
+    return deviation, result
+        
 
-    return all_2
 
-#print("hier gehts los----------------------------------------------------")
-#for i in result:
-#    print(i)
 
 def main():
     
@@ -334,28 +297,16 @@ def main():
 
     print("the four deviations")
     for i in get_dev_and_maxdev():
-        print(i.max_deviation)
-        print(i.deviation)
-    print(len(get_dev_and_maxdev()))
-    
-    print("criterion 2:")
-    for i in get_criterion_2():
-        print(i.criterion_2)    
-    """
-    x_test = Function("x", "test")
-    x_test = x_test.get_column()
-    y_test = Function("y", "test")
-    y_test = y_test.get_column()
-        
-    for i in get_matched_functions(x_test, y_test):
-        print("ignore ideal")
+        print(i.criterion_2)
         print(i.ideal)
-        #print(i.deviation)
-        #print(i.max_deviation)
-        #print(i.criterion_2)
-    """
+    print(len(get_dev_and_maxdev()))
 
-
+    x = Function("x", "test")
+    x = x.get_column()
+    print("endresult")
+    endresult = get_endresult(x)
+    print(endresult[0])
+    print(endresult[1])
 
 if __name__ == '__main__':
     main()

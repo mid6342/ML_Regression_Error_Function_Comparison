@@ -37,13 +37,13 @@ class Test_get_dev_and_max_dev(unittest.TestCase):
             ideal_len = 3, train_len = 2)
         
         max_deviation = []
-        all_deviations = []
+        #all_deviations = []
         for i in result:
-            max_deviation.append(i.max_deviation)
-            all_deviations.append(i.deviation)
+            max_deviation.append(i.criterion_2)
+            #all_deviations.append(i.deviation)
 
         self.assertEqual(max_deviation[1], 2)
-        self.assertEqual(all_deviations[1], 1)
+        #self.assertEqual(all_deviations[1], 1)
 
         
 
