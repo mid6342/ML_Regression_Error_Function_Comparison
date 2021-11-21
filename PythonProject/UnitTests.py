@@ -8,13 +8,14 @@ import numpy as np
 conn = sqlite3.connect("FindingFunctions.db")   
 cur = conn.cursor()
 
+
 class Test_four_ideal_functions(unittest.TestCase):
     def test_four_ideal_functions(self):
         result = Function.four_ideal_functions(
             ideal_name = "ideal_unittest", 
             train_name = "train_unittest", 
             ideal_len = 3, train_len = 2)
-        
+            
         ideal = []
         for i in result:
             ideal.append(i.ideal)
@@ -25,7 +26,23 @@ class Test_four_ideal_functions(unittest.TestCase):
 
         self.assertEqual(ideal[0], "y2")
         self.assertEqual(sod[1], 5)
+ 
 
+class Test_get_dev_and_max_dev(unittest.TestCase):
+    def test_get_dev_and_max_dev(self):
+        result = Function.get_dev_and_maxdev(
+            ideal_name = "ideal_unittest", 
+            train_name = "train_unittest", 
+            test_name = "test_unittest",
+            ideal_len = 3, train_len = 2)
+        
+        max_deviation = []
+        for i in result:
+            max_deviation.append(i.max_deviation)
+
+        self.assertEqual(max_deviation[0], "y2sdafsd")
+
+        
 
 if __name__ == '__main__':
     unittest.main()

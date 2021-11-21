@@ -76,8 +76,8 @@ class Criterion_1:
 
 class Test(Function):
 
-    def __init__(self, column):
-        super().__init__(column, "test")
+    def __init__(self, column, test_name = "test"):
+        super().__init__(column, test_name)
 
 class FunctionAndMaxDev:
 
@@ -199,25 +199,39 @@ CRITERION 2. CODE
 
 """
 
-def get_dev_and_maxdev():
+def get_dev_and_maxdev(ideal_name = "ideal", train_name = "train", test_name = "test", ideal_len = 51, train_len = 5):
     # for loop to get all the deviations between each test point and each ideal function
     four_deviations = []
-    for i in four_ideal_functions():
+    hallo = Test("x", test_name)
+    x_column = hallo.get_column()
+    for i in four_ideal_functions(ideal_name, train_name, ideal_len, train_len):
         
         first_time = True
         all_deviations = []
         y_test = []
 
         for x in x_column:
+            # connect to database
+            conn = sqlite3.connect("FindingFunctions.db")   
+            cur = conn.cursor()
 
-            ideal_query = cur.execute("SELECT " + i.ideal + " FROM ideal WHERE x=" + str(x))
+            ideal_query = cur.execute("SELECT " + i.ideal + " FROM " + ideal_name + " WHERE x=" + str(x))
             for cell in ideal_query: 
                 y_ideal = np.asarray(cell)
+                print(y_ideal)
 
-            test_query = cur.execute("SELECT y FROM test WHERE " + "x" + "=" + str(x))
+            test_query = cur.execute("SELECT y FROM " + test_name + " WHERE " + "x" + "=" + str(x))
+            counter = -1
             for cell in test_query: 
                 np.array(y_test.append(cell[0]))
+                print(y_test)
+                counter = counter +1
 
+            deviation = abs(y_test[counter]-y_ideal)
+            print("and next: deviation: ")
+            print(deviation)
+
+            """
             if(len(y_test) == 1):
                 deviation = abs(y_test - y_ideal)
 
@@ -227,9 +241,14 @@ def get_dev_and_maxdev():
 
             else:
                 deviation = abs(y_test[1] - y_ideal)
+            """
 
             y_test.clear()
             all_deviations.append(deviation[0]) # 0 nuir um die Ergebnisse im Arraay zhu nem array und keinem tuopel zu machen
+
+            # commit and close connection to database    
+            conn. commit()
+            conn.close()
 
         # calculate max deviation between the respective train and ideal function
         y = Ideal(i.ideal)
