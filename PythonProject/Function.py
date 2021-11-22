@@ -3,6 +3,9 @@ import numpy as np
 #from operator import itemgetter
 from bokeh.plotting import figure, show, output_file
 from sqlalchemy.sql.expression import table
+from sqlalchemy import create_engine, Table, Column, MetaData, REAL
+import pandas as pd 
+import csv
 
 """
 
@@ -235,7 +238,29 @@ def visualize(x, y, x_1, y_1, x_error_band, y_error_band, y_error_band_minus, x_
     p.line(x_error_band, y_error_band_minus, line_color='orange', line_width = 1.25)
     show(p)   
 
+def load_endresult_to_database():
+    # create the database + what means echo=True?
+    engine = create_engine('sqlite:///FindingFunctions.db', echo=True)
 
+    metadata = MetaData()
+    # Define the table with sqlalchemy:
+
+    res_table = Table('res', metadata,
+        Column('x', REAL),
+        Column('y', REAL),
+        Column('ideal', REAL),
+        Column('deviation', REAL),
+    )
+
+    metadata.create_all(engine)
+    insert_query = "INSERT INTO res (x, y, ideal, deviation) VALUES (:x, :y, :ideal, :deviation)"
+
+    with open('file.csv', 'r', encoding="utf-8") as csvfile:
+        csv_reader = csv.reader(csvfile, delimiter=',')
+        engine.execute(
+            insert_query,
+            [{"x": row[1], "y": row[2], "ideal": row[3], "deviation": row[4]} for row in csv_reader]
+        )
 
 
 
@@ -246,10 +271,18 @@ def main():
 
     x = Function("x", "test")
     x = x.get_column()
+    y = Function("y", "test")
+    y = y.get_column()
     print("endresult")
     endresult = get_endresult(x)
     print(endresult[0])
     print(endresult[1])
+
+    pd.DataFrame(list(zip(x, y, endresult[1], endresult[0]))).to_csv("file.csv")
+
+    load_endresult_to_database()
+
+    # save data
 
     # hier werden die x und y columns für test dataset erstellt
     hallox = Test("x")
