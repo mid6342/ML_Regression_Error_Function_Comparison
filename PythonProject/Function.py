@@ -104,7 +104,10 @@ def four_ideal_functions(ideal_name = "ideal", train_name = "train", ideal_len =
     four_ideal = sorted(all_deviations, key=lambda x: x.median_deviation)
     return four_ideal[:4]
 
-def visualize_ideal_and_train(four_ideal_fnc, x):
+def visualize_ideal_and_train(four_ideal_fnc):
+
+    x = Function("x", "train")
+    x = x.get_column()
 
     for i in four_ideal_fnc:
 
@@ -123,62 +126,6 @@ def visualize_ideal_and_train(four_ideal_fnc, x):
         p.line(x, y_ideal, line_color='red', line_width = 1.25)
         p.line(x, y_train, line_width = 1.25)
         show(p)
-
-"""
-
-CRITERION 2. VISUALIZATION
-
-
-"""
-
-#output_file = 'index.html'
-#evtl max y und max x von den testpoints verwenden
-def visualize(x, y, x_1, y_1, x_error_band, y_error_band, y_error_band_minus):
-    p = figure(
-        title = 'ideal_1',
-        x_axis_label = 'X',
-        y_axis_label = 'Y',
-        #y_range = (-30, 30) # am bestenhier die max y werte der jew column nehmen, das ist das sinnvollstae
-    )
-    p.line(x, y, line_color='red', line_width = 1.25)
-    p.line(x_1, y_1, line_width = 1.25) #, line_width = '2')
-    p.circle(x_column, y_column, size =5, color = 'green')
-    p.line(x_error_band, y_error_band, line_color='orange', line_width = 1.25)
-    p.line(x_error_band, y_error_band_minus, line_color='orange', line_width = 1.25)
-    show(p)   
-
-# hier werden die x und y columns für test dataset erstellt
-hallox = Test("x")
-x_column = hallox.get_column()
-halloy = Test("y")
-y_column = halloy.get_column()
-
-
-
-#plotting an ideal function
-x_ideal = Ideal("x")
-x_ideal_column = x_ideal.get_column()
-
-y_ideal_column = []
-f_y_column = []
-y_error_band = []
-y_error_band_minus = []
-k = 0
-for i in four_ideal_functions():
-    #print(i.ideal)
-    y = Ideal(i.ideal)
-    y_ideal_column.append(y.get_column()) 
-    f = Train(i.train)
-    f_y_column.append(f.get_column())
-    y_error_band.append(y.get_column() + (0.24 * np.sqrt(2)))
-    y_error_band_minus.append(y.get_column() - (0.24 * np.sqrt(2))) 
-    visualize(x_ideal_column, y_ideal_column[k], x_ideal_column, f_y_column[k], x_ideal_column, y_error_band[k], y_error_band_minus[k])
-    k = k+1
-
-#print(y_ideal_column[0])
-#print(x_ideal_column)
-
-
 
 """
 
@@ -244,16 +191,6 @@ def get_dev_and_maxdev(ideal_name = "ideal", train_name = "train", test_name = "
         criterion_2 = Criterion_2(i.ideal, criterion_2_array)
         four_deviations.append(criterion_2)
 
-
-
-        """
-        #four_deviations.append(all_deviations)   
-        res = FunctionAndMaxDev(i.ideal, all_deviations, max_deviation, "None")
-        four_deviations.append(res)
-        print("this are the 4 deviations: ")
-        print(all_deviations)
-        """
-
     return four_deviations
     
 # for loop to get all the results of criterion 2 and save it to the Object
@@ -274,32 +211,38 @@ def get_endresult(x):
                     result[y] = (result[y], i.ideal)
             y = y+1
     return deviation, result
+
+"""
+
+CRITERION 2. VISUALIZATION
+
+
+"""
+
+#output_file = 'index.html'
+#evtl max y und max x von den testpoints verwenden
+def visualize(x, y, x_1, y_1, x_error_band, y_error_band, y_error_band_minus, x_column, y_column):
+    p = figure(
+        title = 'ideal_1',
+        x_axis_label = 'X',
+        y_axis_label = 'Y',
+        #y_range = (-30, 30) # am bestenhier die max y werte der jew column nehmen, das ist das sinnvollstae
+    )
+    p.line(x, y, line_color='red', line_width = 1.25)
+    p.line(x_1, y_1, line_width = 1.25) #, line_width = '2')
+    p.circle(x_column, y_column, size =5, color = 'green')
+    p.line(x_error_band, y_error_band, line_color='orange', line_width = 1.25)
+    p.line(x_error_band, y_error_band_minus, line_color='orange', line_width = 1.25)
+    show(p)   
+
+
+
+
+
         
-
-
-
 def main():
-    
-    #import_ideal()
-    #import_train()
-    #import_test()
-    x = Function("x", "train")
-    x = x.get_column()
-    
-    visualize_ideal_and_train(four_ideal_functions(), x)
 
-    print("the median_deviation")
-    for i in four_ideal_functions():
-        print(i.median_deviation)
-    print(len(four_ideal_functions()))
-
-    #get_dev_and_maxdev()
-
-    print("the four deviations")
-    for i in get_dev_and_maxdev():
-        print(i.criterion_2)
-        print(i.ideal)
-    print(len(get_dev_and_maxdev()))
+    visualize_ideal_and_train(four_ideal_functions())
 
     x = Function("x", "test")
     x = x.get_column()
@@ -307,6 +250,31 @@ def main():
     endresult = get_endresult(x)
     print(endresult[0])
     print(endresult[1])
+
+    # hier werden die x und y columns für test dataset erstellt
+    hallox = Test("x")
+    x_column = hallox.get_column()
+    halloy = Test("y")
+    y_column = halloy.get_column()
+
+    #plotting an ideal function
+    x_ideal = Ideal("x")
+    x_ideal_column = x_ideal.get_column()
+
+    y_ideal_column = []
+    f_y_column = []
+    y_error_band = []
+    y_error_band_minus = []
+    k = 0
+    for i in four_ideal_functions():
+        y = Ideal(i.ideal)
+        y_ideal_column.append(y.get_column()) 
+        f = Train(i.train)
+        f_y_column.append(f.get_column())
+        y_error_band.append(y.get_column() + (y.max_deviation(f) * np.sqrt(2)))
+        y_error_band_minus.append(y.get_column() - (y.max_deviation(f) * np.sqrt(2))) 
+        visualize(x_ideal_column, y_ideal_column[k], x_ideal_column, f_y_column[k], x_ideal_column, y_error_band[k], y_error_band_minus[k], x_column, y_column)
+        k = k+1
 
 if __name__ == '__main__':
     main()
