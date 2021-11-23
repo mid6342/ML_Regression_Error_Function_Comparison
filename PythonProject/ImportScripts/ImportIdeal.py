@@ -1,5 +1,6 @@
 import csv
 from sqlalchemy import create_engine, Table, Column, MetaData, REAL
+from os import path
 
 
 # create the database + what means echo=True?
@@ -71,15 +72,10 @@ y42, y43, y44, y45, y46, y47, y48, y49, y50) VALUES (:x, :y1, :y2, :y3, :y4, :y5
 :y23, :y24, :y25, :y26, :y27, :y28, :y29, :y30, :y31, :y32, :y33, :y34, :y35, :y36, :y37, :y38,
 :y39, :y40, :y41, :y42, :y43, :y44, :y45, :y46, :y47, :y48, :y49, :y50)"""
 
-    # Or read the definition from the DB:
-    # metadata.reflect(engine, only=['MyTable'])
-    # my_table = Table('MyTable', metadata, autoload=True, autoload_with=engine)
-    # insert_query = my_table.insert()
+if path.exists('data//ideal.csv') != True:
+    raise Exception("Please put the file into a seperate folder called data")
 
-    # Or hardcode the SQL query:
-    # insert_query = "INSERT INTO MyTable (foo, bar) VALUES (:foo, :bar)"
-
-with open('ideal.csv', 'r', encoding="utf-8") as csvfile:
+with open('data//ideal.csv', 'r', encoding="utf-8") as csvfile:
     csv_reader = csv.reader(csvfile, delimiter=',')
     engine.execute(
         insert_query,

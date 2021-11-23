@@ -1,5 +1,7 @@
 import csv
 from sqlalchemy import create_engine, Table, Column, MetaData, REAL
+from os import path
+
 
 
 # create the database + what means echo=True?
@@ -16,8 +18,10 @@ test_unittest_table = Table('test_unittest', metadata,
 metadata.create_all(engine)
 insert_query = """INSERT INTO test_unittest (x, y) VALUES (:x, :y)"""
 
+if path.exists('data//test_unittest.csv') != True:
+    raise Exception("Please put the file into a seperate folder called data")
 
-with open('test_unittest.csv', 'r', encoding="utf-8") as csvfile:
+with open('data//test_unittest.csv', 'r', encoding="utf-8") as csvfile:
     csv_reader = csv.reader(csvfile, delimiter=',')
     engine.execute(
         insert_query,

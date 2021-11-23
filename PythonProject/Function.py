@@ -6,6 +6,7 @@ from sqlalchemy.sql.expression import table
 from sqlalchemy import create_engine, Table, Column, MetaData, REAL
 import pandas as pd 
 import csv
+from os import path
 
 """
 
@@ -178,6 +179,7 @@ def get_dev_and_maxdev(ideal_name = "ideal", train_name = "train", test_name = "
 
         # ab hier test einer neuen methode
         criterion_2_array = []
+        print(max_deviation)
 
         for x in all_deviations:
             if(x <= (max_deviation * np.sqrt(2))):
@@ -192,16 +194,18 @@ def get_dev_and_maxdev(ideal_name = "ideal", train_name = "train", test_name = "
 
         #print(criterion_2_array)
         criterion_2 = Criterion_2(i.ideal, criterion_2_array)
+        print(i.ideal)
         four_deviations.append(criterion_2)
 
     return four_deviations
-    
 # for loop to get all the results of criterion 2 and save it to the Object
 
-def get_endresult(x):
+def get_endresult(ideal_name = "ideal", train_name = "train", test_name = "test", ideal_len = 51, train_len = 5):
+    x = Function("x", "test")
+    x = x.get_column()
     deviation = ["None"]* len(x)
     result = ["None"]* len(x)
-    for i in get_dev_and_maxdev():
+    for i in get_dev_and_maxdev(ideal_name, train_name, test_name, ideal_len, train_len):
         y=0
         for cell in i.criterion_2:
 
@@ -236,7 +240,23 @@ def visualize(x, y, x_1, y_1, x_error_band, y_error_band, y_error_band_minus, x_
     p.circle(x_column, y_column, size =5, color = 'green')
     p.line(x_error_band, y_error_band, line_color='orange', line_width = 1.25)
     p.line(x_error_band, y_error_band_minus, line_color='orange', line_width = 1.25)
-    show(p)   
+    show(p)  
+
+    # close up visualization for better view
+    p = figure(
+        title = 'ideal_1',
+        x_axis_label = 'X',
+        y_axis_label = 'Y',
+        y_range = (np.min(y_error_band_minus-2), np.max(y_error_band)+2) # am bestenhier die max y werte der jew column nehmen, das ist das sinnvollstae
+    )
+    p.line(x, y, line_color='red', line_width = 1.25)
+    p.line(x_1, y_1, line_width = 1.25) #, line_width = '2')
+    p.circle(x_column, y_column, size =5, color = 'green')
+    p.line(x_error_band, y_error_band, line_color='orange', line_width = 1.25)
+    p.line(x_error_band, y_error_band_minus, line_color='orange', line_width = 1.25)
+    show(p) 
+
+
 
 def load_endresult_to_database():
     # create the database + what means echo=True?
@@ -255,7 +275,7 @@ def load_endresult_to_database():
     metadata.create_all(engine)
     insert_query = "INSERT INTO res (x, y, ideal, deviation) VALUES (:x, :y, :ideal, :deviation)"
 
-    with open('file.csv', 'r', encoding="utf-8") as csvfile:
+    with open('data//file.csv', 'r', encoding="utf-8") as csvfile:
         csv_reader = csv.reader(csvfile, delimiter=',')
         engine.execute(
             insert_query,
@@ -274,11 +294,11 @@ def main():
     y = Function("y", "test")
     y = y.get_column()
     print("endresult")
-    endresult = get_endresult(x)
+    endresult = get_endresult()
     print(endresult[0])
     print(endresult[1])
 
-    pd.DataFrame(list(zip(x, y, endresult[1], endresult[0]))).to_csv("file.csv")
+    pd.DataFrame(list(zip(x, y, endresult[1], endresult[0]))).to_csv("data//file.csv")
 
     load_endresult_to_database()
 

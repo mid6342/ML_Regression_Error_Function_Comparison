@@ -1,6 +1,6 @@
 import csv
 from sqlalchemy import create_engine, Table, Column, MetaData, REAL
-
+from os import path
 
 # create the database + what means echo=True?
 engine = create_engine('sqlite:///FindingFunctions.db', echo=True)
@@ -19,15 +19,10 @@ train_table = Table('train', metadata,
 metadata.create_all(engine)
 insert_query = "INSERT INTO train (x, y1, y2, y3, y4) VALUES (:x, :y1, :y2, :y3, :y4)"
 
-    # Or read the definition from the DB:
-    # metadata.reflect(engine, only=['MyTable'])
-    # my_table = Table('MyTable', metadata, autoload=True, autoload_with=engine)
-    # insert_query = my_table.insert()
+if path.exists('data//train.csv') != True:
+    raise Exception("Please put the file into a seperate folder called data")
 
-    # Or hardcode the SQL query:
-    # insert_query = "INSERT INTO MyTable (foo, bar) VALUES (:foo, :bar)"
-
-with open('train.csv', 'r', encoding="utf-8") as csvfile:
+with open('data//train.csv', 'r', encoding="utf-8") as csvfile:
     csv_reader = csv.reader(csvfile, delimiter=',')
     engine.execute(
         insert_query,
